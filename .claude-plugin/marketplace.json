@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "xiao",
+  "description": "Judgment layer: reward-hacking detector for coding agents",
+  "owner": { "name": "syr" },
+  "plugins": [
+    {
+      "name": "xiao",
+      "description": "PostToolUse hacking detector — flags string-match verification and test edits",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
