@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HARD="$ROOT/demo/hard"
 
-rm -rf "$HARD/.xiao/flags.jsonl" "$HARD/.xiao/verdict.json" "$HARD/.xiao/regression.jsonl"
+rm -rf "$HARD/.xiao/flags.jsonl" "$HARD/.xiao/verdict.json" "$HARD/.xiao/regression.jsonl" "$HARD"/**/__pycache__
 echo '{"tool_name":"Bash","tool_input":{"command":"rg x src/"},"cwd":"'"$HARD"'"}' | node "$ROOT/hooks/hacking-detector.js" >/dev/null
 
 echo "=== Stop verdict (v0.3) ==="

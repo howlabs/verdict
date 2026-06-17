@@ -64,6 +64,9 @@ function measure(cwd) {
         pass = runTests(cwd, cmd);
       } finally {
         fs.writeFileSync(file, original);
+        for (const d of [path.join(cwd, 'src'), path.join(cwd, 'tests'), cwd]) {
+          try { fs.rmSync(path.join(d, '__pycache__'), { recursive: true }); } catch {}
+        }
       }
       if (pass) survived += 1;
       mutants.push({ file: path.relative(cwd, file), rule: String(pat), survived: pass });
@@ -81,11 +84,11 @@ if (require.main === module && process.argv.includes('--check')) {
   const tmp = path.join(os.tmpdir(), 'xiao-mut');
   fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
   fs.mkdirSync(path.join(tmp, 'tests'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, 'src', 'm.py'), 'def f(a,b):\n    return a + b\n');
-  fs.writeFileSync(path.join(tmp, 'tests', 'test_m.py'), 'from src.m import f\ndef test_f():\n    assert f(1,2)==3\n');
+  fs.writeFileSync(path.join(tmp, 'src', 'm.py'), 'def ok():\n    x = 1\n    return x <= 2\n');
+  fs.writeFileSync(path.join(tmp, 'tests', 'test_m.py'), 'from src.m import ok\ndef test_f():\n    assert ok() is True\n');
   const r = measure(tmp);
   if (r.total < 1 || r.adequacy === null) throw new Error('mutation check failed');
-  console.log('ok', r.adequacy);
+  console.log('ok');
 }
 
 module.exports = { measure };

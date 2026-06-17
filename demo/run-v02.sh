@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HARD="$ROOT/demo/hard"
 
 chmod +x "$HARD/evaluation.sh"
-rm -rf "$HARD/.xiao/flags.jsonl" "$HARD/.xiao/verdict.json" "$HARD/.xiao/session.json"
+rm -rf "$HARD/.xiao/flags.jsonl" "$HARD/.xiao/verdict.json" "$HARD/.xiao/session.json" "$HARD"/**/__pycache__
 
 echo "=== 1) PreToolUse snapshot ==="
 echo '{"tool_name":"Bash","tool_input":{"command":"echo x"},"cwd":"'"$HARD"'","hook_event_name":"PreToolUse"}' \
