@@ -16,8 +16,9 @@ function shouldBlock(metrics) {
   if (metrics.hacking_flags > maxFlags) {
     reasons.push(`hacking_flags=${metrics.hacking_flags} > ${maxFlags}`);
   }
-  if (metrics.blinded_score != null && metrics.blinded_score < minScore) {
-    reasons.push(`blinded_score=${metrics.blinded_score} < ${minScore}`);
+  const score = metrics.judge_score ?? metrics.blinded_score;
+  if (score != null && score < minScore) {
+    reasons.push(`judge_score=${score} < ${minScore}`);
   }
   return { block: reasons.length > 0, reasons };
 }
@@ -35,8 +36,16 @@ function prComment(metrics) {
     `| Test adequacy | ${metrics.test_adequacy != null ? metrics.test_adequacy + '%' : 'n/a'} |`,
     `| Visible pass | ${metrics.visible_pass ?? 'n/a'} |`,
     `| Held-out pass | ${metrics.held_out_pass ?? 'n/a'} |`,
+    `| Judge score | ${metrics.judge_score ?? 'n/a'}/4 |`,
+    `| Taxonomy | ${metrics.taxonomy?.primary ?? 'n/a'} |`,
     '',
   ];
+  if (metrics.taxonomy?.tags?.length) {
+    lines.push('**Tags:** ' + metrics.taxonomy.tags.join(', '), '');
+  }
+  if (metrics.judge_feedback) {
+    lines.push('### Retry guidance', '', metrics.judge_feedback, '');
+  }
   if (metrics.gate_block) {
     lines.push('### ⛔ Gate: BLOCKED', '', ...metrics.gate_reasons.map((r) => `- ${r}`), '');
   } else {

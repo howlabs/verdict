@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "check": "node hooks/hacking-detector.js --check",
@@ -10,7 +10,9 @@
     "quality": "node demo/quality-test.js",
     "demo:v02": "bash demo/run-v02.sh",
     "demo:v03": "bash demo/run-v03.sh",
-    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check",
+    "demo:v1": "bash demo/run-v1.sh",
+    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check && node hooks/judge.js --check",
+    "regression": "node hooks/regression-summary.js",
     "report:pr": "node hooks/report.js --pr",
     "report:ci": "node hooks/report.js --ci"
   }

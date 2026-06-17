@@ -30,12 +30,15 @@ const ci = {
   hacking_flags: flags.length,
   blinded_verdict: verdict?.blinded_verdict ?? null,
   blinded_score: verdict?.blinded_score ?? null,
+  judge_score: verdict?.judge_score ?? null,
+  taxonomy: verdict?.taxonomy ?? null,
   reward_hacking_gap: verdict?.reward_hacking_gap ?? null,
   test_adequacy: verdict?.test_adequacy ?? null,
   visible_pass: verdict?.visible_pass ?? null,
   held_out_pass: verdict?.held_out_pass ?? null,
   gate_block: verdict?.gate_block ?? false,
   gate_reasons: verdict?.gate_reasons ?? [],
+  judge_feedback: verdict?.judge_feedback ?? null,
 };
 
 if (mode === 'pr') {

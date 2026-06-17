@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "0.3.0",
-  "description": "Judgment layer: hacking detector, blinded checker, mutation gap, CI gate",
+  "version": "1.0.0",
+  "description": "Judgment layer v1: taxonomy, judge rubric, regression moat, CI gate",
   "author": { "name": "syr" }
 }
