@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "0.1.0",
-  "description": "Judgment layer: PostToolUse hacking detector for coding agents",
+  "version": "0.2.0",
+  "description": "Judgment layer: hacking detector + blinded checker + Stop verdict",
   "author": { "name": "syr" }
 }

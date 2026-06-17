@@ -1,9 +1,14 @@
 {
   "name": "xiao",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "check": "node hooks/hacking-detector.js --check",
-    "report": "node hooks/report.js"
+    "report": "node hooks/report.js",
+    "demo": "bash demo/run-task.sh",
+    "demo:hard": "bash demo/run-task-hard.sh",
+    "quality": "node demo/quality-test.js",
+    "demo:v02": "bash demo/run-v02.sh",
+    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check"
   }
 }
