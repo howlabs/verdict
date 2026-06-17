@@ -1,0 +1,9 @@
+{
+  "name": "xiao",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "check": "node hooks/hacking-detector.js --check",
+    "report": "node hooks/report.js"
+  }
+}
