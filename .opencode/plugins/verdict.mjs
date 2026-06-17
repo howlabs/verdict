@@ -1,4 +1,4 @@
-// xiao — OpenCode adapter (docs.md §3: agent-neutral hooks)
+// verdict — OpenCode adapter
 import { createRequire } from 'module';
 import { spawnSync } from 'child_process';
 import path from 'path';

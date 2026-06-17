@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// xiao v0.2 — Blinded Checker: 3-phase MARCH-lite (docs.md §5①)
+// verdict — Blinded Checker: 3-phase MARCH-lite
 // Proposer sees diff → claims. Checker sees spec+repo only. Judge scores.
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const SPEC_CANDIDATES = ['.xiao/spec.md', '.xiao/spec.txt', 'SPEC.md', 'docs.md'];
+const SPEC_CANDIDATES = ['.verdict/spec.md', '.xiao/spec.md', '.verdict/spec.txt', '.xiao/spec.txt', 'SPEC.md'];
 
 function findSpec(cwd) {
   for (const rel of SPEC_CANDIDATES) {

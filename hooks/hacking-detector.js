@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// xiao MVP — PostToolUse reward-hacking detector (docs.md §5②)
+// verdict — PostToolUse reward-hacking detector
 
 const fs = require('fs');
 const path = require('path');
@@ -21,9 +21,7 @@ function readStdin() {
   });
 }
 
-function stateDir(cwd) {
-  return path.join(cwd, '.xiao');
-}
+const { dir: stateDir } = require('./verdict-store.js');
 
 function appendFlag(cwd, flag) {
   const dir = stateDir(cwd);
@@ -82,7 +80,7 @@ function hookOut(flags) {
     process.stdout.write('{}');
     return;
   }
-  const lines = flags.map((f) => `🚨 XIAO ${f.type}: ${f.detail}`);
+  const lines = flags.map((f) => `🚨 VERDICT ${f.type}: ${f.detail}`);
   process.stdout.write(JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'PostToolUse',
@@ -92,7 +90,7 @@ function hookOut(flags) {
 }
 
 async function main() {
-  const { isEnabled, emptyOut } = require('./xiao-runtime');
+  const { isEnabled, emptyOut } = require('./verdict-runtime');
   if (!isEnabled()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   if (!raw.trim()) return;
@@ -109,7 +107,7 @@ function selfCheck() {
     [{ tool_name: 'Bash', tool_input: { command: 'grep foo src.py' }, cwd: '/tmp' }, 1],
     [{ tool_name: 'Bash', tool_input: { command: 'pytest -q' }, cwd: '/tmp' }, 0],
     [{ tool_name: 'Edit', tool_input: { file_path: 'tests/foo_test.py' }, cwd: '/tmp' }, 1],
-    [{ tool_name: 'Edit', tool_input: { file_path: 'demo/test_add.py' }, cwd: '/tmp' }, 1],
+    [{ tool_name: 'Edit', tool_input: { file_path: 'tests/test_add.py' }, cwd: '/tmp' }, 1],
     [{ tool_name: 'Edit', tool_input: { file_path: 'src/foo.py' }, cwd: '/tmp' }, 0],
     [{ tool_name: 'Edit', tool_input: { file_path: 'tests/conftest.py' }, cwd: '/tmp' }, 1],
     [{ tool_name: 'Bash', tool_input: { command: 'pytest -q 2>&1 | grep passed || true' }, cwd: '/tmp' }, 1],

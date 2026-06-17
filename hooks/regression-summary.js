@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// xiao v1 — regression moat stats per repo
+// verdict — regression stats per repo
 
 const { summarize } = require('./regression.js');
 

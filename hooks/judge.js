@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// xiao v1 — Judge: sub-questions + rubric 1–4 (docs.md §5④ DeepVerifier-lite)
+// verdict — Judge: sub-questions + rubric 1–4
 // Không giải lại task — chỉ verify từng claim/signal.
 
 const { spawnSync } = require('child_process');
@@ -69,7 +69,7 @@ function feedback(subs, taxonomy) {
     hints.push('Đọc lại spec; implementation chưa cover yêu cầu (blinded reject).');
   }
   if (taxonomy.tags.includes('under_constrained_tests')) {
-    hints.push('Test adequacy cao — thêm assertion cho edge case (STING).');
+    hints.push('Mutant survival rate cao trên visible suite — thêm assertion cho edge case (STING).');
   }
   return `Retry (${taxonomy.primary}): ${hints.join(' ')}`;
 }
@@ -88,9 +88,10 @@ function judge(metrics, flags, blinded, taxonomy) {
   };
 }
 
-// ponytail: optional tiny LLM verify per rejected claim — XIAO_LLM=1
+// ponytail: optional tiny LLM verify per rejected claim — VERDICT_LLM=1
 function llmVerifyClaim(spec, claim, fileContent) {
-  if (process.env.XIAO_LLM !== '1') return null;
+  const { env } = require('./verdict-runtime.js');
+  if (env('LLM') !== '1') return null;
   const prompt = `Sub-question ONLY (do not solve task): spec says requirements below. Does file content support claim "${claim.asserted}"? Reply JSON: {"score":1-4,"reason":"..."}\n\nSPEC:\n${spec.slice(0, 1500)}\n\nFILE:\n${fileContent.slice(0, 1500)}`;
   const r = spawnSync('claude', ['-p', prompt, '--max-turns', '1'], {
     encoding: 'utf8',
@@ -107,7 +108,7 @@ function llmVerifyClaim(spec, claim, fileContent) {
 if (require.main === module && process.argv.includes('--check')) {
   const blinded = { rejected: [{ asserted: 'x' }] };
   const j = judge(
-    { visible_pass: true, held_out_pass: false, hacking_flags: 1, test_adequacy: 50, blinded_verdict: 1 },
+    { visible_pass: true, held_out_pass: false, hacking_flags: 1, mutant_survival_rate: 50, blinded_verdict: 1 },
     [{ type: 'HACK_STRING_MATCH' }],
     blinded,
     { primary: 'reward_hacking_gap', tags: ['reward_hacking_gap'] },

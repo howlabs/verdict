@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// xiao v0.3 — ConVerTest-lite: sinh held-out từ spec (docs.md §5③)
+// verdict — ConVerTest-lite: held-out from spec
 
 const fs = require('fs');
 const path = require('path');
@@ -7,7 +7,8 @@ const { findSpec } = require('./blinded-checker.js');
 
 function generate(cwd) {
   const specPath = findSpec(cwd);
-  const outDir = path.join(cwd, '.xiao', 'held-out');
+  const { dir } = require('./verdict-store');
+  const outDir = path.join(dir(cwd), 'held-out');
   if (!specPath) return { generated: 0, reason: 'no spec' };
 
   const spec = fs.readFileSync(specPath, 'utf8');
@@ -19,7 +20,7 @@ function generate(cwd) {
   if (fs.existsSync(target)) return { generated: 0, reason: 'already exists', path: target };
 
   const body = bullets.map((b, i) => `    # ${b.trim().slice(1).trim()}`).join('\n');
-  const content = `"""xiao ConVerTest-lite — generated from spec, không dùng patch làm oracle."""
+  const content = `"""verdict ConVerTest-lite — generated from spec, không dùng patch làm oracle."""
 import pytest
 
 def test_spec_constraints_exist():

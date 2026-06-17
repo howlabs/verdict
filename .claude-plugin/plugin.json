@@ -1,6 +1,6 @@
 {
-  "name": "xiao",
-  "version": "1.1.0",
-  "description": "Judgment layer v1.1: /xiao on|lite|off toggle, taxonomy, CI gate",
+  "name": "verdict",
+  "version": "1.0.0",
+  "description": "Judgment layer: patch correctness vs test-suite adequacy (alias: xiao)",
   "author": { "name": "syr" }
 }

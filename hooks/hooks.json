@@ -6,8 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/xiao-activate.js\" || exit 0",
-            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\xiao-activate.js\" }",
+            "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/verdict-activate.js\" || exit 0",
+            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\verdict-activate.js\" }",
             "timeout": 3
           }
         ]
@@ -18,8 +18,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/xiao-mode-tracker.js\" || exit 0",
-            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\xiao-mode-tracker.js\" }",
+            "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/verdict-mode-tracker.js\" || exit 0",
+            "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\verdict-mode-tracker.js\" }",
             "timeout": 3
           }
         ]
@@ -34,7 +34,7 @@
             "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-tool-use.js\" || exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\pre-tool-use.js\" }",
             "timeout": 5,
-            "statusMessage": "xiao: capturing repo state..."
+            "statusMessage": "verdict: capturing repo state..."
           }
         ]
       }
@@ -48,7 +48,7 @@
             "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/hacking-detector.js\" || exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\hacking-detector.js\" }",
             "timeout": 5,
-            "statusMessage": "xiao: scanning for reward hacking..."
+            "statusMessage": "verdict: scanning for reward hacking..."
           }
         ]
       }
@@ -61,7 +61,7 @@
             "command": "command -v node >/dev/null 2>&1 && node \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-judge.js\" || exit 0",
             "commandWindows": "if (Get-Command node -ErrorAction SilentlyContinue) { node \"$env:CLAUDE_PLUGIN_ROOT\\hooks\\stop-judge.js\" }",
             "timeout": 60,
-            "statusMessage": "xiao: running blinded checker + verdict..."
+            "statusMessage": "verdict: running blinded checker + gate..."
           }
         ]
       }

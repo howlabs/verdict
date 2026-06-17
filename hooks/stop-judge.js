@@ -1,18 +1,24 @@
 #!/usr/bin/env node
-// xiao v1 — Stop: full judgment pipeline (docs.md §4–6)
+// verdict — Stop: full judgment pipeline
 
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-const { read, write } = require('./xiao-store');
+const { read, write, dir, heldOutDir } = require('./verdict-store');
 const { run: blindedRun } = require('./blinded-checker.js');
 const { measure: measureMutation } = require('./mutation.js');
 const { generate: genHeldOut } = require('./held-out-gen.js');
-const { shouldBlock, prComment } = require('./gate.js');
+const { prComment } = require('./gate.js');
 const { store: storeRegression } = require('./regression.js');
 const { classify } = require('./taxonomy.js');
 const { judge, llmVerifyClaim } = require('./judge.js');
 const { findSpec } = require('./blinded-checker.js');
+const {
+  loadAgentRuntime,
+  buildStructuredVerdict,
+  formatStopLines,
+  buildCaseStudy,
+} = require('./verdict-schema.js');
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -32,9 +38,30 @@ function runSh(cwd, cmd) {
 }
 
 function loadFlags(cwd) {
-  const log = path.join(cwd, '.xiao', 'flags.jsonl');
-  if (!fs.existsSync(log)) return [];
-  return fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l));
+  const { legacyDir } = require('./verdict-store');
+  const out = [];
+  for (const log of [path.join(dir(cwd), 'flags.jsonl'), path.join(legacyDir(cwd), 'flags.jsonl')]) {
+    if (!fs.existsSync(log)) continue;
+    for (const line of fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean)) {
+      out.push(JSON.parse(line));
+    }
+  }
+  return out;
+}
+
+function heldOutCmd(cwd) {
+  const heldDir = heldOutDir(cwd);
+  if (!fs.existsSync(heldDir)) return null;
+  const pkgPath = path.join(cwd, 'package.json');
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+      if (deps.vitest) return 'npm run test:held-out';
+      if (deps.jest) return 'npx jest --testPathPattern=held-out --passWithNoTests';
+    } catch { /* fall through */ }
+  }
+  return `python3 -m pytest "${heldDir}" -q`;
 }
 
 function computeGap(cwd) {
@@ -42,8 +69,8 @@ function computeGap(cwd) {
   let visible = null;
   let heldOut = null;
   if (fs.existsSync(evalSh)) visible = runSh(cwd, 'bash evaluation.sh');
-  const heldDir = path.join(cwd, '.xiao', 'held-out');
-  if (fs.existsSync(heldDir)) heldOut = runSh(cwd, `python3 -m pytest "${heldDir}" -q`);
+  const heldCmd = heldOutCmd(cwd);
+  if (heldCmd) heldOut = runSh(cwd, heldCmd);
   if (visible === null || heldOut === null) return { visible, held_out: heldOut, gap: null };
   return { visible, held_out: heldOut, gap: (visible ? 1 : 0) - (heldOut ? 1 : 0) };
 }
@@ -63,7 +90,9 @@ async function buildVerdict(cwd) {
     reward_hacking_gap: gap.gap,
     visible_pass: gap.visible,
     held_out_pass: gap.held_out,
-    test_adequacy: mutation.adequacy,
+    mutant_survival_rate: mutation.mutant_survival_rate,
+    mutation_kill_rate: mutation.mutation_kill_rate,
+    test_adequacy: mutation.mutant_survival_rate,
   };
 
   const taxonomy = classify(metrics, flags);
@@ -80,35 +109,43 @@ async function buildVerdict(cwd) {
     if (rv) llmReviews.push({ claim: rej.id, ...rv });
   }
 
-  const gate = shouldBlock({ ...metrics, judge_score: judged.judge_score });
+  const agent_runtime = loadAgentRuntime(cwd);
+  const structured = buildStructuredVerdict({
+    cwd,
+    gap,
+    mutation,
+    flags,
+    judged,
+    taxonomy,
+    flatMetrics: metrics,
+    blinded,
+    llmReviews,
+    session,
+    agent_runtime,
+  });
+
+  if (!judged.pass && structured.gate.decision !== 'block') {
+    structured.gate.decision = 'block';
+    structured.gate.block = true;
+    structured.gate.reasons.push(`judge_score=${judged.judge_score}<3`);
+    structured.gate_block = true;
+    structured.gate_reasons = structured.gate.reasons;
+  }
 
   const report = {
     ts: Date.now(),
-    ...metrics,
-    blinded_feedback: blinded.verdict.feedback,
-    mutation_total: mutation.total,
-    mutation_survived: mutation.survived,
-    mutants: mutation.mutants,
-    taxonomy,
-    judge_score: judged.judge_score,
-    judge_pass: judged.pass,
-    judge_feedback: judged.feedback,
-    sub_questions: judged.sub_questions,
-    llm_reviews: llmReviews,
-    gate_block: gate.block || !judged.pass,
-    gate_reasons: gate.block ? gate.reasons : (!judged.pass ? [`judge_score=${judged.judge_score}<3`] : []),
-    claims: blinded.claims,
-    rejected: blinded.rejected,
+    ...structured,
   };
 
   write(cwd, 'verdict.json', report);
-  fs.writeFileSync(path.join(cwd, '.xiao', 'pr-comment.md'), prComment(report));
+  fs.writeFileSync(path.join(dir(cwd), 'case-study.json'), JSON.stringify(buildCaseStudy(cwd, report), null, 2));
+  fs.writeFileSync(path.join(dir(cwd), 'pr-comment.md'), prComment(report));
   storeRegression(cwd, report);
   return report;
 }
 
 async function main() {
-  const { isEnabled, isFull, emptyOut } = require('./xiao-runtime');
+  const { isEnabled, isFull, emptyOut } = require('./verdict-runtime');
   if (!isEnabled() || !isFull()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   const cwd = (() => {
@@ -118,22 +155,14 @@ async function main() {
 
   const report = await buildVerdict(cwd);
 
-  const lines = [
-    `📋 XIAO v1 verdict — judge ${report.judge_score}/4 | taxonomy: ${report.taxonomy.primary}`,
-    `  hacking_flags: ${report.hacking_flags}`,
-    `  reward_hacking_gap: ${report.reward_hacking_gap ?? 'n/a'}`,
-    `  test_adequacy: ${report.test_adequacy != null ? report.test_adequacy + '%' : 'n/a'}`,
-    `  blinded_verdict: ${report.blinded_verdict} rejected`,
-    report.gate_block ? `  ⛔ BLOCKED: ${report.gate_reasons.join('; ')}` : '  ✅ passed',
-    report.judge_feedback,
-  ];
+  const lines = formatStopLines(report);
 
   const out = {
     hookSpecificOutput: { hookEventName: 'Stop', additionalContext: lines.join('\n') },
   };
-  if (report.gate_block) {
+  if (report.gate.decision === 'block') {
     out.decision = 'block';
-    out.reason = report.gate_reasons.join('; ');
+    out.reason = report.gate.reasons.join('; ');
   }
   process.stdout.write(JSON.stringify(out));
 }

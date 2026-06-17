@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// xiao v0.2 — PreToolUse: snapshot repo + track tool intent (docs.md §3)
+// verdict — PreToolUse: snapshot repo + track tool intent
 
 const { execSync } = require('child_process');
-const { read, write } = require('./xiao-store');
+const { read, write } = require('./verdict-store');
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -18,7 +18,7 @@ function gitRev(cwd) {
 }
 
 async function main() {
-  const { isFull, emptyOut } = require('./xiao-runtime');
+  const { isFull, emptyOut } = require('./verdict-runtime');
   if (!isFull()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   if (!raw.trim()) return;

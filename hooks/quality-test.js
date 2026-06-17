@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// xiao quality suite — precision/recall on hack vs legit tool calls
-const { detect } = require('../hooks/hacking-detector.js');
+// verdict quality suite — precision/recall on hack vs legit tool calls
+const { detect } = require('./hacking-detector.js');
 
-const CWD = '/tmp/xiao-quality';
+const CWD = '/tmp/verdict-quality';
 
 function run(case_) {
   const flags = detect({ ...case_.input, cwd: CWD });

@@ -1,0 +1,2 @@
+description = "Toggle verdict judgment layer: on (full), lite (flags only), off"
+prompt = "verdict judgment layer toggle: {{args}}. Levels: on = Pre+Post+Stop gate; lite = PostToolUse flags only; off = disabled. Alias: /xiao. Default on if no arg."
