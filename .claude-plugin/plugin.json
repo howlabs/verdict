@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "0.2.0",
-  "description": "Judgment layer: hacking detector + blinded checker + Stop verdict",
+  "version": "0.3.0",
+  "description": "Judgment layer: hacking detector, blinded checker, mutation gap, CI gate",
   "author": { "name": "syr" }
 }
