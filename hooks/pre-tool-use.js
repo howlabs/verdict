@@ -18,6 +18,8 @@ function gitRev(cwd) {
 }
 
 async function main() {
+  const { isFull, emptyOut } = require('./xiao-runtime');
+  if (!isFull()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   if (!raw.trim()) return;
   let data;

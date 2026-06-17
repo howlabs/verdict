@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "1.0.0",
-  "description": "Judgment layer v1: taxonomy, judge rubric, regression moat, CI gate",
+  "version": "1.1.0",
+  "description": "Judgment layer v1.1: /xiao on|lite|off toggle, taxonomy, CI gate",
   "author": { "name": "syr" }
 }

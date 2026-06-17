@@ -1,6 +1,6 @@
 {
   "name": "xiao",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "check": "node hooks/hacking-detector.js --check",
@@ -11,7 +11,9 @@
     "demo:v02": "bash demo/run-v02.sh",
     "demo:v03": "bash demo/run-v03.sh",
     "demo:v1": "bash demo/run-v1.sh",
-    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check && node hooks/judge.js --check",
+    "demo:swe": "bash demo/run-swe-task.sh simulate",
+    "demo:swe:claude": "bash demo/run-swe-task.sh claude",
+    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check && node hooks/judge.js --check && bash demo/test-toggle.sh",
     "regression": "node hooks/regression-summary.js",
     "report:pr": "node hooks/report.js --pr",
     "report:ci": "node hooks/report.js --ci"

@@ -92,6 +92,8 @@ function hookOut(flags) {
 }
 
 async function main() {
+  const { isEnabled, emptyOut } = require('./xiao-runtime');
+  if (!isEnabled()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   if (!raw.trim()) return;
   try {

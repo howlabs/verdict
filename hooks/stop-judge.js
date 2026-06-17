@@ -108,6 +108,8 @@ async function buildVerdict(cwd) {
 }
 
 async function main() {
+  const { isEnabled, isFull, emptyOut } = require('./xiao-runtime');
+  if (!isEnabled() || !isFull()) return emptyOut();
   const raw = (await readStdin()).replace(/^\uFEFF/, '');
   const cwd = (() => {
     try { return JSON.parse(raw || '{}').cwd || process.cwd(); }
