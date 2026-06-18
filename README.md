@@ -37,3 +37,17 @@ node hooks/plugin-compare.js .
 ```
 
 Legacy env: `XIAO_*` still works; prefer `VERDICT_*`.
+
+## Requirements
+
+- **Python 3.9+** for `.py` mutation (`ast.unparse` in `hooks/mutation-ast.py`)
+- **Node.js** for hooks and JS/TS token mutation
+
+## Held-out and mutation tiers
+
+| Tier | Held-out | Mutation |
+|------|----------|----------|
+| **Default** | Rule-based: spec bullets → keyword-presence pytest in `.verdict/held-out/` | Python: stdlib AST; JS/TS: token-scan (skips strings, comments, regex literals) |
+| **Recommended** | Set `VERDICT_LLM=1` — `claude -p` generates behavioral held-out tests from spec | — |
+
+Rule-based held-out checks that keywords from the spec appear in source — not full behavior. A weak visible suite can still pass held-out while mutants survive. Use LLM held-out when you need behavioral coverage without hand-writing tests.

@@ -80,11 +80,28 @@ function pyMutants(file, limit) {
   }
 }
 
+function likelyRegexAt(code, i) {
+  if (code[i] !== '/' || code.slice(i, i + 2) === '//') return false;
+  let p = i - 1;
+  while (p >= 0 && /\s/.test(code[p])) p -= 1;
+  return p < 0 || /[=([,:;!&|?{}]/.test(code[p]);
+}
+
 function scanCodeSpans(code) {
   const spans = [];
   let i = 0;
   while (i < code.length) {
     const rest = code.slice(i);
+    if (likelyRegexAt(code, i)) {
+      let j = i + 1;
+      while (j < code.length) {
+        if (code[j] === '\\') { j += 2; continue; }
+        if (code[j] === '/') { i = j + 1; break; }
+        j += 1;
+      }
+      if (j >= code.length) i = code.length;
+      continue;
+    }
     if (rest.startsWith('//')) {
       const end = code.indexOf('\n', i);
       i = end === -1 ? code.length : end + 1;
@@ -248,6 +265,7 @@ if (require.main === module && process.argv.includes('--check')) {
   const jm = jsMutants(fs.readFileSync(path.join(jsTmp, 'src', 'm.js'), 'utf8'));
   if (jm.length < 1) throw new Error('js mutation check failed');
   if (jsMutants('return x === 1').some((m) => m.source.includes('!= ='))) throw new Error('js op overlap');
+  if (jsMutants('const r = /<=/; return x <= 1').some((m) => !m.source.includes('/<=/'))) throw new Error('regex literal mutated');
   console.log('ok');
 }
 

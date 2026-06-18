@@ -33,6 +33,12 @@ function passLabel(pass) {
   return pass ? '✅' : '❌';
 }
 
+function suiteScopeLabel(scope) {
+  if (scope === 'visible') return 'visible-only (evaluation.sh or tests/)';
+  if (scope === 'default') return 'project test cmd (npm test, etc.)';
+  return scope;
+}
+
 function buildPatchCorrectness({ gap, flags, judged, maxFlags = 4 }) {
   const visible = gap.visible;
   const heldout = gap.held_out;
@@ -184,7 +190,7 @@ function formatStopLines(report) {
   } else if (surv != null) {
     const survPct = s.mutant_survival_rate_pct ?? surv;
     const killPct = s.mutation_kill_rate_pct ?? s.test_adequacy_score;
-    lines.push(`  suite: survival=${survPct}% (bad↑) kill=${killPct}% adequacy_score=${killPct}% (${s.mutants_survived}/${s.mutants_total} on ${s.suite_scope})`);
+    lines.push(`  suite: survival=${survPct}% (bad↑) kill=${killPct}% adequacy_score=${killPct}% (${s.mutants_survived}/${s.mutants_total}, ${suiteScopeLabel(s.suite_scope)})`);
   } else {
     lines.push('  suite: mutation n/a');
   }
