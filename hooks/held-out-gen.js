@@ -36,15 +36,19 @@ function parseBullet(line) {
   return { text, keywords };
 }
 
+function isTrivialTestBody(body) {
+  return !body || !/def test_/m.test(body) || /assert\s+True\b/.test(body);
+}
+
 function buildRuleTests(bullets, srcFiles) {
   const blocks = [];
   bullets.forEach((line, i) => {
     const { text, keywords } = parseBullet(line);
     if (!keywords.length) return;
-    const safe = text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    const note = text.replace(/\s+/g, ' ').slice(0, 200);
     blocks.push(`
 def test_held_out_spec_${i}():
-    """${safe}"""
+    # spec: ${note.replace(/#/g, '')}
     combined = ""
     for rel in ${JSON.stringify(srcFiles)}:
         p = ROOT / rel
@@ -68,9 +72,10 @@ function llmHeldOutTests(spec, srcFiles, cwd) {
     + `Output ONLY valid Python test functions, no markdown. Each test must assert behavior or keywords from spec, NOT assert True.\n\n`
     + `SPEC:\n${spec.slice(0, 2500)}\n\nSOURCE (read-only context):\n${sample}`;
   const r = spawnSync('claude', ['-p', prompt, '--max-turns', '1'], { encoding: 'utf8', timeout: 90000 });
-  const body = (r.stdout || '').trim();
-  if (!body || /assert\s+True\s*$/m.test(body)) return null;
-  return body.replace(/^```(?:python)?\s*/m, '').replace(/```\s*$/m, '').trim();
+  if (r.status !== 0 || r.error) return null;
+  const body = (r.stdout || '').trim().replace(/^```(?:python)?\s*/m, '').replace(/```\s*$/m, '').trim();
+  if (isTrivialTestBody(body)) return null;
+  return body;
 }
 
 function generate(cwd) {
@@ -101,7 +106,7 @@ ROOT = Path(__file__).resolve().parents[2]
   const content = llmBody
     ? `${header}\n${llmBody}\n`
     : `${header}${ruleBody}\n`;
-  if (/assert\s+True\b/.test(content) && !llmBody) {
+  if (isTrivialTestBody(content.replace(header, ''))) {
     return { generated: 0, reason: 'only trivial assertions' };
   }
   fs.writeFileSync(target, content);
@@ -110,7 +115,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 if (require.main === module && process.argv.includes('--check')) {
   const os = require('os');
-  const tmp = path.join(os.tmpdir(), 'xiao-held');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xiao-held-'));
   fs.mkdirSync(path.join(tmp, '.verdict'), { recursive: true });
   fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
   fs.writeFileSync(path.join(tmp, '.verdict', 'spec.md'), '# spec\n- rate_limiter must use window_sec\n');

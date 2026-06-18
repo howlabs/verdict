@@ -113,6 +113,12 @@ function scanCodeSpans(code) {
   return new Set(spans);
 }
 
+function validJsOp(code, idx, from) {
+  // ponytail: skip == inside ===, != inside !==
+  if ((from === '==' || from === '!=') && code[idx + 2] === '=') return false;
+  return true;
+}
+
 function jsMutants(code, limit = 12) {
   const codeIdx = scanCodeSpans(code);
   const mutants = [];
@@ -124,7 +130,7 @@ function jsMutants(code, limit = 12) {
       const idx = code.indexOf(from, pos);
       if (idx === -1) break;
       pos = idx + from.length;
-      if (!codeIdx.has(idx)) continue;
+      if (!codeIdx.has(idx) || !validJsOp(code, idx, from)) continue;
       const mutant = code.slice(0, idx) + to + code.slice(idx + from.length);
       if (mutant === code || seen.has(mutant)) continue;
       seen.add(mutant);
@@ -241,6 +247,7 @@ if (require.main === module && process.argv.includes('--check')) {
   fs.writeFileSync(path.join(jsTmp, 'src', 'm.js'), 'export function ok(x) { return x <= 2; }\n');
   const jm = jsMutants(fs.readFileSync(path.join(jsTmp, 'src', 'm.js'), 'utf8'));
   if (jm.length < 1) throw new Error('js mutation check failed');
+  if (jsMutants('return x === 1').some((m) => m.source.includes('!= ='))) throw new Error('js op overlap');
   console.log('ok');
 }
 

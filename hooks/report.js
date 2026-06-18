@@ -44,7 +44,7 @@ function buildCiPayload() {
   if (!verdict?.patch_correctness) {
     return {
       ci_only: { visible_pass: verdict?.visible_pass, would_merge: verdict?.visible_pass },
-      verdict: { gate: { decision: verdict?.gate_block ? 'block' : 'pass' } },
+      verdict: { gate: { decision: verdict?.gate?.decision ?? (verdict?.gate_block ? 'block' : 'pass') } },
     };
   }
 
@@ -69,8 +69,9 @@ function buildCiPayload() {
 }
 
 const ci = buildCiPayload();
-const gateBlocked = ci.verdict?.gate?.decision === 'block'
-  || verdict?.gate?.decision === 'block'
+const gateHold = (d) => d === 'block' || d === 'inconclusive';
+const gateBlocked = gateHold(ci.verdict?.gate?.decision)
+  || gateHold(verdict?.gate?.decision)
   || verdict?.gate_block;
 
 if (mode === 'case-study') {
