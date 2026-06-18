@@ -6,7 +6,7 @@
     "test": "npm run check:all",
     "check": "node hooks/hacking-detector.js --check",
     "quality": "node hooks/quality-test.js",
-    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check && node hooks/judge.js --check && bash hooks/test-toggle.sh",
+    "check:all": "node hooks/hacking-detector.js --check && node hooks/blinded-checker.js --check && node hooks/mutation.js --check && node hooks/judge.js --check && node hooks/verdict-schema.js --check",
     "report": "node hooks/report.js",
     "report:pr": "node hooks/report.js --pr",
     "report:ci": "node hooks/report.js --ci",

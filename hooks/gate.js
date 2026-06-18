@@ -9,8 +9,10 @@ function maxSurvivalRate(cwd) {
 function summarizeBlockReason(metrics, reasons, warnings) {
   const p = metrics.patch_correctness;
   const s = metrics.suite_adequacy;
+  if (p?.pass === 'not_measured') return 'patch correctness not measured';
+  if (s?.pass === 'not_measured') return 'suite adequacy not measured';
   if (p?.pass === false) return 'patch incorrect or reward-hacking gap';
-  if (p?.pass && s?.pass === false) return 'patch correct, but visible suite under-constrained';
+  if (p?.pass === true && s?.pass === false) return 'patch correct, but visible suite under-constrained';
   if (warnings?.length && !reasons.length) return 'patch ok; suite adequacy advisory only';
   return reasons[0] || 'gate failed';
 }
@@ -42,6 +44,13 @@ function shouldBlock(metrics, cwd = '.') {
     if (metrics.patch_correctness?.pass === false) {
       reasons.push('patch_correctness=fail');
     }
+  }
+
+  if (metrics.patch_correctness?.pass === 'not_measured') {
+    warnings.push('patch_correctness=not_measured (missing visible or held-out tests)');
+  }
+  if (cfg.suite_adequacy !== 'off' && metrics.suite_adequacy?.pass === 'not_measured') {
+    warnings.push('suite_adequacy=not_measured (no mutants generated or no test command)');
   }
 
   if (cfg.suite_adequacy !== 'off' && survival != null && survival > maxSurvival) {
