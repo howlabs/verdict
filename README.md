@@ -18,7 +18,7 @@ Or add this repo to a Claude Code marketplace (`/.claude-plugin/marketplace.json
 | `/verdict lite` | PostToolUse flags only |
 | `/verdict off` | Disabled |
 
-Alias: `/xiao`. State: `~/.claude/.verdict-active`. Artifacts: `.verdict/` in the project.
+State: `~/.claude/.verdict-active`. Artifacts: `.verdict/` in the project.
 
 Optional gate policy: `verdict.gate.json` (`suite_adequacy`: `required` or `advisory`).
 
@@ -35,8 +35,6 @@ node hooks/report.js . --ci
 node hooks/report.js . --pr
 node hooks/plugin-compare.js .
 ```
-
-Legacy env: `XIAO_*` still works; prefer `VERDICT_*`.
 
 ## Requirements
 

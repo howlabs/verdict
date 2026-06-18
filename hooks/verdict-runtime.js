@@ -1,15 +1,9 @@
-// verdict — global on/off state (ponytail-style)
+// verdict — global on/off state
 
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const {
-  STATE_FILE,
-  LEGACY_STATE_FILE,
-  CMD,
-  LEGACY_CMD,
-  NAME_UPPER,
-} = require('./brand.js');
+const { STATE_FILE, CMD, NAME_UPPER } = require('./brand.js');
 
 const VALID = new Set(['on', 'off', 'lite']);
 
@@ -18,12 +12,7 @@ function claudeDir() {
 }
 
 function statePath() {
-  const dir = claudeDir();
-  const next = path.join(dir, STATE_FILE);
-  const legacy = path.join(dir, LEGACY_STATE_FILE);
-  if (fs.existsSync(next)) return next;
-  if (fs.existsSync(legacy)) return legacy;
-  return next;
+  return path.join(claudeDir(), STATE_FILE);
 }
 
 function getMode() {
@@ -39,14 +28,12 @@ function setMode(mode) {
   const m = (mode || 'on').toLowerCase();
   if (!VALID.has(m)) return getMode();
   fs.mkdirSync(claudeDir(), { recursive: true });
-  fs.writeFileSync(path.join(claudeDir(), STATE_FILE), m);
+  fs.writeFileSync(statePath(), m);
   return m;
 }
 
 function clearMode() {
-  for (const f of [STATE_FILE, LEGACY_STATE_FILE]) {
-    try { fs.unlinkSync(path.join(claudeDir(), f)); } catch {}
-  }
+  try { fs.unlinkSync(statePath()); } catch {}
 }
 
 function isEnabled() {
@@ -67,14 +54,11 @@ function emptyOut() {
 
 function env(key, fallback = undefined) {
   const v = process.env[`VERDICT_${key}`];
-  if (v != null && v !== '') return v;
-  const legacy = process.env[`XIAO_${key}`];
-  if (legacy != null && legacy !== '') return legacy;
-  return fallback;
+  return (v != null && v !== '') ? v : fallback;
 }
 
 function toggleHelp() {
-  return `${NAME_UPPER}: use ${CMD} on|lite|off (alias ${LEGACY_CMD})`;
+  return `${NAME_UPPER}: use ${CMD} on|lite|off`;
 }
 
 module.exports = {

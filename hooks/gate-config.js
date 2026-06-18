@@ -15,7 +15,7 @@ function loadGateConfig(cwd) {
     mutant_survival_threshold: Number(env('MAX_SURVIVAL_RATE') ?? env('MAX_ADEQUACY') ?? 60),
   };
 
-  for (const rel of ['.verdict/gate.json', 'verdict.gate.json', '.xiao/gate.json', 'xiao.gate.json']) {
+  for (const rel of ['.verdict/gate.json', 'verdict.gate.json']) {
     const p = path.join(cwd || '.', rel);
     if (!fs.existsSync(p)) continue;
     try {

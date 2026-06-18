@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const { appendLine, read, dir } = require('./verdict-store');
-const { GLOBAL_REGRESSION, LEGACY_GLOBAL_REGRESSION } = require('./brand.js');
+const { GLOBAL_REGRESSION } = require('./brand.js');
 
 function repoId(cwd) {
   try {
@@ -40,7 +40,6 @@ function store(cwd, verdict) {
 
   const home = process.env.HOME || '/tmp';
   const globalDir = path.join(home, GLOBAL_REGRESSION, 'regression');
-  const legacyDir = path.join(home, LEGACY_GLOBAL_REGRESSION, 'regression');
   fs.mkdirSync(globalDir, { recursive: true });
   const globalFile = path.join(globalDir, `${entry.repo}.jsonl`);
   fs.appendFileSync(globalFile, JSON.stringify({ ...entry, cwd }) + '\n');

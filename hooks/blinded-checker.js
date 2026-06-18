@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const SPEC_CANDIDATES = ['.verdict/spec.md', '.xiao/spec.md', '.verdict/spec.txt', '.xiao/spec.txt', 'SPEC.md'];
+const SPEC_CANDIDATES = ['.verdict/spec.md', '.verdict/spec.txt', 'SPEC.md'];
 
 function findSpec(cwd) {
   for (const rel of SPEC_CANDIDATES) {
@@ -101,9 +101,9 @@ function run(cwd, opts = {}) {
 }
 
 if (require.main === module && process.argv.includes('--check')) {
-  const tmp = path.join(require('os').tmpdir(), 'xiao-blind-check');
-  fs.mkdirSync(path.join(tmp, '.xiao'), { recursive: true });
-  fs.writeFileSync(path.join(tmp, '.xiao', 'spec.md'), '# spec\nrate_limiter.py must use window_sec\n');
+  const tmp = path.join(require('os').tmpdir(), 'verdict-blind-check');
+  fs.mkdirSync(path.join(tmp, '.verdict'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, '.verdict', 'spec.md'), '# spec\nrate_limiter.py must use window_sec\n');
   fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'src', 'rate_limiter.py'), 'def allow(): return True\n');
   const diff = '+++ b/src/other.py\n+def foo(): return 1\n';

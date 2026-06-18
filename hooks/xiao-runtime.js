@@ -1,1 +1,0 @@
-module.exports = require('./verdict-runtime.js');

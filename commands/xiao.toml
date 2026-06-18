@@ -1,2 +1,0 @@
-description = "Alias for /verdict — toggle judgment layer on|lite|off"
-prompt = "verdict judgment layer toggle (alias /xiao): {{args}}. See /verdict on|lite|off."

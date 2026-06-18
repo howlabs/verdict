@@ -212,7 +212,7 @@ function buildCaseStudy(cwd, verdict) {
   const s = verdict.suite_adequacy;
   const g = verdict.gate;
 
-  let headline = 'Xiao judgment summary';
+  let headline = 'Verdict judgment summary';
   if (p.pass === true && s.pass === false && g.decision === 'block') {
     headline = 'The agent fixed the bug. The tests did not.';
   } else if (p.pass === true && s.pass === true && g.decision === 'pass') {

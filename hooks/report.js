@@ -20,15 +20,9 @@ function readJson(name) {
 }
 
 const flags = (() => {
-  const { legacyDir } = require('./verdict-store');
-  const out = [];
-  for (const log of [path.join(base, 'flags.jsonl'), path.join(legacyDir(cwd), 'flags.jsonl')]) {
-    if (!fs.existsSync(log)) continue;
-    for (const line of fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean)) {
-      out.push(JSON.parse(line));
-    }
-  }
-  return out;
+  const log = path.join(base, 'flags.jsonl');
+  if (!fs.existsSync(log)) return [];
+  return fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line));
 })();
 
 const byType = {};

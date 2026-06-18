@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// verdict — UserPromptSubmit: /verdict on|off|lite (alias /xiao)
+// verdict — UserPromptSubmit: /verdict on|off|lite
 
 const { setMode, getMode, emptyOut } = require('./verdict-runtime');
-const { NAME_UPPER, CMD, LEGACY_CMD } = require('./brand.js');
+const { NAME_UPPER, CMD } = require('./brand.js');
 
-const CMD_RE = new RegExp(`^[/@$](?:verdict|xiao)\\b`);
+const CMD_RE = /^[/@$]verdict\b/;
 
 let input = '';
 process.stdin.on('data', (c) => { input += c; });
@@ -31,7 +31,7 @@ process.stdin.on('end', () => {
       }
     }
 
-    if (/\b(stop (?:verdict|xiao)|(?:verdict|xiao) off)\b/i.test(prompt)) {
+    if (/\b(stop verdict|verdict off)\b/i.test(prompt)) {
       setMode('off');
       changed = 'off';
     }
@@ -43,7 +43,7 @@ process.stdin.on('end', () => {
           ? `${NAME_UPPER} LITE — PostToolUse flags only, no Stop gate`
           : changed === 'on'
             ? `${NAME_UPPER} ON — full judgment layer (Pre/Post/Stop)`
-            : `${NAME_UPPER} status: ${getMode()} (${CMD}, alias ${LEGACY_CMD})`;
+            : `${NAME_UPPER} status: ${getMode()} (${CMD})`;
       process.stdout.write(JSON.stringify({
         hookSpecificOutput: {
           hookEventName: 'UserPromptSubmit',

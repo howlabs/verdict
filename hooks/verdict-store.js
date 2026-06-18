@@ -1,21 +1,13 @@
 const fs = require('fs');
 const path = require('path');
-const { ARTIFACT_DIR, LEGACY_ARTIFACT_DIR } = require('./brand.js');
-
-function legacyDir(cwd) {
-  return path.join(cwd, LEGACY_ARTIFACT_DIR);
-}
+const { ARTIFACT_DIR } = require('./brand.js');
 
 function dir(cwd) {
   return path.join(cwd, ARTIFACT_DIR);
 }
 
 function resolveReadPath(cwd, name) {
-  const primary = path.join(dir(cwd), name);
-  if (fs.existsSync(primary)) return primary;
-  const legacy = path.join(legacyDir(cwd), name);
-  if (fs.existsSync(legacy)) return legacy;
-  return primary;
+  return path.join(dir(cwd), name);
 }
 
 function read(cwd, name, fallback = null) {
@@ -39,11 +31,7 @@ function appendLine(cwd, name, obj) {
 }
 
 function heldOutDir(cwd) {
-  const primary = path.join(dir(cwd), 'held-out');
-  if (fs.existsSync(primary)) return primary;
-  const legacy = path.join(legacyDir(cwd), 'held-out');
-  if (fs.existsSync(legacy)) return legacy;
-  return primary;
+  return path.join(dir(cwd), 'held-out');
 }
 
-module.exports = { dir, legacyDir, read, write, appendLine, heldOutDir, resolveReadPath };
+module.exports = { dir, read, write, appendLine, heldOutDir, resolveReadPath };

@@ -52,7 +52,6 @@ function buildDelta(ci, verdictBlock) {
     ci_would_merge: ciMerge,
     verdict_would_merge: verdictMerge,
     ci_would_merge_but_verdict_blocks: ciMerge && !verdictMerge,
-    _deprecated: { ci_would_merge_but_xiao_blocks: ciMerge && !verdictMerge },
   };
 }
 

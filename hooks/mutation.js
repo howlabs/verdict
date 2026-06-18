@@ -37,7 +37,7 @@ function listSourceFiles(cwd) {
     if (!fs.existsSync(dir)) return;
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, ent.name);
-      if (ent.isDirectory() && !/test|__pycache__|node_modules|\.verdict|\.xiao/.test(ent.name)) walk(p);
+      if (ent.isDirectory() && !/test|__pycache__|node_modules|\.verdict/.test(ent.name)) walk(p);
       else if (ent.isFile() && /\.(py|ts|js|mjs|cjs)$/.test(p) && !/test/i.test(p)) out.push(p);
     }
   }
@@ -252,14 +252,14 @@ function measure(cwd) {
 
 if (require.main === module && process.argv.includes('--check')) {
   const os = require('os');
-  const tmp = path.join(os.tmpdir(), 'xiao-mut');
+  const tmp = path.join(os.tmpdir(), 'verdict-mut');
   fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
   fs.mkdirSync(path.join(tmp, 'tests'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'src', 'm.py'), 'def ok():\n    x = 1\n    return x <= 2\n');
   fs.writeFileSync(path.join(tmp, 'tests', 'test_m.py'), 'from src.m import ok\ndef test_f():\n    assert ok() is True\n');
   const r = measure(tmp);
   if (r.total < 1 || r.mutant_survival_rate === null) throw new Error('mutation check failed');
-  const jsTmp = path.join(os.tmpdir(), 'xiao-mut-js');
+  const jsTmp = path.join(os.tmpdir(), 'verdict-mut-js');
   fs.mkdirSync(path.join(jsTmp, 'src'), { recursive: true });
   fs.writeFileSync(path.join(jsTmp, 'src', 'm.js'), 'export function ok(x) { return x <= 2; }\n');
   const jm = jsMutants(fs.readFileSync(path.join(jsTmp, 'src', 'm.js'), 'utf8'));

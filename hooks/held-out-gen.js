@@ -17,7 +17,7 @@ function listSrcFiles(cwd) {
     if (!fs.existsSync(dir)) return;
     for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
       const p = path.join(dir, ent.name);
-      if (ent.isDirectory() && !/test|node_modules|\.verdict|\.xiao|__pycache__/.test(ent.name)) walk(p);
+      if (ent.isDirectory() && !/test|node_modules|\.verdict|__pycache__/.test(ent.name)) walk(p);
       else if (ent.isFile() && /\.(py|ts|js)$/.test(p) && !/test/i.test(p)) out.push(path.relative(cwd, p).replace(/\\/g, '/'));
     }
   }
@@ -115,7 +115,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 if (require.main === module && process.argv.includes('--check')) {
   const os = require('os');
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'xiao-held-'));
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'verdict-held-'));
   fs.mkdirSync(path.join(tmp, '.verdict'), { recursive: true });
   fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
   fs.writeFileSync(path.join(tmp, '.verdict', 'spec.md'), '# spec\n- rate_limiter must use window_sec\n');
