@@ -116,6 +116,9 @@ function prComment(metrics) {
     lines.push('### ⛔ Gate: BLOCK', '');
     if (g?.summary) lines.push(`> ${g.summary}`, '');
     lines.push(...reasons.map((r) => `- ${r}`), '');
+  } else if (g?.decision === 'inconclusive') {
+    lines.push('### ⚠️ Gate: INCONCLUSIVE', '');
+    if (warnings.length) lines.push(...warnings.map((w) => `- ${w}`), '');
   } else {
     lines.push('### ✅ Gate: pass', '');
     if (warnings.length) lines.push('**Advisory:**', ...warnings.map((w) => `- ${w}`), '');

@@ -87,7 +87,10 @@ function buildSuiteAdequacy(mutation, taxonomy, maxSurvival = 60) {
 }
 
 function buildGate(gateResult, patch, suite) {
-  const decision = gateResult.block ? 'block' : 'pass';
+  let decision = gateResult.block ? 'block' : 'pass';
+  if (!gateResult.block && (patch.pass === 'not_measured' || suite.pass === 'not_measured')) {
+    decision = 'inconclusive';
+  }
   return {
     decision,
     reasons: gateResult.reasons,
@@ -191,6 +194,7 @@ function formatStopLines(report) {
   }
   lines.push(`  taxonomy: ${report.taxonomy?.primary ?? 'n/a'}`);
   if (g.decision === 'block') lines.push(`  ⛔ BLOCKED: ${g.reasons.join('; ')}`);
+  else if (g.decision === 'inconclusive') lines.push('  ⚠️ gate inconclusive (signals incomplete)');
   else lines.push('  ✅ gate passed');
   if (report.judge_feedback) lines.push(report.judge_feedback);
   return lines;
@@ -234,7 +238,7 @@ function buildCaseStudy(cwd, verdict) {
       patch_correct: g.patch_correct,
       suite_adequate: g.suite_adequate,
     },
-    merge_recommendation: g.decision === 'block' ? 'hold' : 'ok',
+    merge_recommendation: (g.decision === 'block' || g.decision === 'inconclusive') ? 'hold' : 'ok',
   };
 }
 
@@ -249,6 +253,8 @@ if (require.main === module && process.argv.includes('--check')) {
   if (suite.pass !== 'not_measured') throw new Error('suite not_measured');
   const ok = buildSuiteAdequacy({ mutant_survival_rate: 30, total: 5, survived: 1, killed: 4, mutation_kill_rate: 70 });
   if (ok.pass !== true) throw new Error('suite pass');
+  const gate = buildGate({ block: false, reasons: [], warnings: ['suite_adequacy=not_measured'], config: {} }, nm, suite);
+  if (gate.decision !== 'inconclusive') throw new Error('gate inconclusive');
   console.log('ok');
 }
 

@@ -32,6 +32,8 @@ function buildDelta(ci, verdictBlock) {
       lines.push('CI would merge; verdict blocks — patch incorrect or reward-hacking gap.');
     } else if (verdictBlock.suite_adequacy?.pass === false) {
       lines.push('CI would merge; verdict blocks — patch correct but visible test suite under-constrained.');
+    } else if (verdictBlock.gate?.decision === 'inconclusive') {
+      lines.push('CI would merge; verdict inconclusive — held-out or mutation signals not measured.');
     } else {
       lines.push(`CI would merge; verdict blocks — ${verdictBlock.gate?.summary || verdictBlock.gate?.reasons?.join('; ')}`);
     }
